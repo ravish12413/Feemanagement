@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fee Management – Admin (Dummy UI)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Root Variables */
+    :root {
+      --bg: #0f172a;
+      /* Slate-900 */
+      --panel: #111827;
+      /* Gray-900 */
+      --card: #1f2937;
+      /* Gray-800 */
+      --muted: #94a3b8;
+      /* Slate-400 */
+      --text: #e5e7eb;
+      /* Gray-200 */
+      --primary: #60a5fa;
+      /* Blue-400 */
+      --primary-2: #3b82f6;
+      /* Blue-500 */
+      --outline: #334155;
+      /* Slate-700 */
+      --ok: #22c55e;
+      /* Green-500 */
+      --warn: #f59e0b;
+      /* Amber-500 */
+      --danger: #ef4444;
+      /* Red-500 */
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Reset and Base Styles */
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(120deg, #0b1220 0%, #0e1424 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+    }
+
+    /* Layout */
+    .wrap {
+      max-width: 1100px;
+      margin: 28px auto;
+      padding: 0 18px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand .logo {
+      width: 44px;
+      height: 44px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      margin: 0;
+      letter-spacing: 0.3px;
+    }
+
+    /* Top Navigation (Tabs) */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tabs a {
+      text-decoration: none;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--outline);
+      padding: 10px 14px;
+      border-radius: 999px;
+      transition: 0.2s ease;
+    }
+
+    .tabs a:hover {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) inset;
+    }
+
+    .tabs a.active {
+      background: linear-gradient(180deg, var(--primary), var(--primary-2));
+      color: #0b1220;
+      border-color: transparent;
+    }
+
+    /* Sections */
+    section {
+      display: none;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    /* Cards */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Forms */
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin: 10px 0 6px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      background: #0b1220;
+      color: var(--text);
+      border: 1px solid var(--outline);
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .feedback {
+      color: var(--danger);
+      text-align: center;
+      padding: 1rem;
+      font-size: 13px;
+    }
+
+    .chart-container {
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .summary p {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .summary span {
+      color: var(--primary);
+    }
+
+    @media (min-width: 700px) {
+      .row.two {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .row.three {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    .btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #0b1220;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--outline);
+    }
+
+    .btn.warn {
+      background: var(--warn);
+      color: #0b1220;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--outline);
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--outline);
+    }
+
+    th {
+      background: #0b1220;
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid var(--outline);
+    }
+
+    .tag.ok {
+      border-color: rgba(34, 197, 94, 0.5);
+      color: #86efac;
+    }
+
+    .tag.due {
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin: 26px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">SS</div>
+        <h1>Fee Management – Admin</h1>
+      </div>
+      <nav class="tabs" id="tabs">
+        <a href="#fee-setup" data-tab="fee-setup" class="active">Fee Setup</a>
+        <a href="#payments" data-tab="payments">Make Payment</a>
+        <a href="#reports" data-tab="reports">View Reports</a>
+      </nav>
+    </header>
+
+    <!-- Fee Setup -->
+    <section id="fee-setup" class="active">
+      <div class="grid">
+        <!-- Class Fee (common) -->
+        <div class="card">
+          <h2>Assign Class Fees (Common)</h2>
+          <p class="muted">Tuition, Exam, or any fee applied to the entire class.</p>
+          <div class="row two">
+            <div>
+              <label for="classKey">Class</label>
+              <select id="classKey">
+                <option value="1">Class 1</option>
+                <option value="2">Class 2</option>
+                <option value="3">Class 3</option>
+                <option value="4">Class 4</option>
+                <option value="5">Class 5</option>
+                <option value="6">Class 6</option>
+                <option value="7">Class 7</option>
+                <option value="8">Class 8</option>
+                <option value="9">Class 9</option>
+                <option value="10">Class 10</option>
+                <option value="LKG">LKG</option>
+                <option value="UKG">UKG</option>
+                <option value="Nursery">Nursery</option>
+              </select>
+            </div>
+            <div>
+              <label for="session">Session</label>
+              <input id="session" placeholder="2025-26" readonly/>
+            </div>
+          </div>
+
+          <label>Fee Heads</label>
+          <table id="classFeeTable">
+            <thead>
+              <tr>
+                <th style="width:40%">Fee Name</th>
+                <th style="width:20%">Amount</th>
+                <th style="width:20%">Type</th>
+                <th style="width:20%">Frequency</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" class="feeName"placeholder="Tuition" value="" /></td>
+                <td><input type="number" placeholder="1500" value="" class="feeAmount" /></td>
+                <td>
+                  <select class="type">
+                    <option value="recurring">Recurring</option>
+                    <option value="one-time">One-time</option>
+                  </select>
+                </td>
+                <td>
+                  <select class="frequency">
+                    <option>Monthly</option>
+                    <option>Term</option>
+                    <option>Yearly</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Total Amount</th>
+                <th id="total_amount"></th>
+                <th colspan="2"></th>
+              </tr>
+            </tfoot>
+          </table>
+          <button class="btn ghost" id="add-more">Add More</button>
+          <div class="btns">
+            <button class="btn primary" id="add-fee">Save Class Fee</button>
+            <button class="btn ghost" id="reset-class">Reset</button>
+          </div>
+        </div>
+
+        <!-- Student Fee (individual like transport) -->
+        <div class="card">
+          <h2>Assign Student Fees (Individual)</h2>
+          <p class="muted">Transport/Hostel/Custom fees assigned to a single student.</p>
+
+          <!-- Student Search -->
+          <div class="row two">
+            <div>
+              <label for="studentSearch">Search Student</label>
+              <input id="studentSearch" placeholder="Enter Admission No" />
+            </div>
+
+
+            <div style="align-self:end">
+              <button class="btn primary" id="searchBtn">Search</button>
+            </div>
+          </div>
+
+          <!-- Student Details Card (hidden initially) -->
+          <div class="card" id="studentCard" style="background:#0b1220; margin-top:12px; display:none;">
+            <div class="row three">
+              <div>
+                <label>Student</label>
+                <input id="studentName" readonly />
+              </div>
+              <div>
+                <label>Class</label>
+                <input id="studentClass" readonly />
+              </div>
+              <div>
+                <label>Father's Name</label>
+                <input id="fatherName" readonly />
+              </div>
+            </div>
+
+            <label style="margin-top:12px">Add Fee</label>
+            <div id="studentFeeRows">
+              <div class="row three studentFeeRow">
+                <input placeholder="Fee name e.g. Transport" class="sFeeName" />
+                <input type="number" placeholder="Amount" class="sFeeAmount" />
+
+                <select class="sFeeType">
+                  <option>recurring</option>
+                  <option>One-time</option>
+                </select>
+
+                <select class="sFeefrequency">
+                  <option>Monthly</option>
+                  <option>Term</option>
+                  <option>Yearly</option>
+                  <option>One-time</option>
+                </select>
+              </div>
+            </div>
+
+            <button class="btn ghost" onclick="addStudentFeeRow()">Add More</button>
+
+            <div class="btns">
+              <label for="billingStartMonth">Billing Start Month</label>
+              <input type="month" id="billingStartMonth" style="width: 200px;" />
+              <button class="btn primary" onclick="assignFee()">Assign to Student</button>
+              <button class="btn ghost" onclick="clearFee()">Clear</button>
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <!-- payment -->
+    <section id="payments">
+      <div class="grid">
+        <div class="card">
+          <h2>Search Student to Make Payment</h2>
+
+          <div class="row two">
+            <input id="paySearchInput" placeholder="Enter Admission No" />
+            <button class="btn primary" id="paySearchBtn" style="align-self:end">Search</button>
+          </div>
+          <div id="payFeedback" style="display:none; color:red; margin-top:8px;"></div>
+
+          <div class="card" style="background:#0b1220; margin-top:12px">
+            <!-- Student / Class / Outstanding -->
+            <div class="row three">
+              <div>
+                <label>Student</label>
+                <input id="payStudent" value="" readonly />
+              </div>
+              <div>
+                <label>Class</label>
+                <input id="payClass" value="" readonly />
+              </div>
+              <div>
+                <label>Outstanding</label>
+                <input id="payOutstanding" value="₹ 0" readonly />
+              </div>
+              <div>
+                <label>Advance</label>
+                <input id="advance" value="₹ 0" readonly />
+              </div>
+            </div>
+
+            <!-- Photo + Father’s Name -->
+            <div class="row three" style="margin-top:12px">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <img id="payPhoto" src="default-avatar.png" alt="Student Photo"
+                  style="width:60px;height:60px;border-radius:8px;object-fit:cover;border:2px solid #444;" />
+              </div>
+              <div>
+                <label>Father's Name</label>
+                <input id="payFather" value="" readonly />
+              </div>
+              <div></div>
+            </div>
+
+            <label style="margin-top:12px">Payment Details</label>
+
+            <!-- Payment Rows (dynamic via JS) -->
+            <div id="payRows"></div>
+
+            <!-- Add More -->
+            <div class="row" style="margin-top:8px">
+              <button class="btn ghost" id="payAddRow">+ Add More</button>
+            </div>
+
+            <!-- Note -->
+            <div class="row">
+              <textarea id="payNote" rows="3" placeholder="Note (optional)"></textarea>
+            </div>
+
+
+            <!-- Payment Mode -->
+            <div class="row">
+              <label>Payment Mode</label>
+              <select id="payMode">
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Card">Card</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </div>
+
+            <!-- Totals -->
+            <div class="row three" style="margin-top:12px">
+              <div>
+                <label>Total Month's Calculated</label>
+                <input id="payTotalCalculated" value="₹ 0" readonly />
+              </div>
+              <div>
+                <label>Selected Total:</label>
+                <input id="paySelectedTotal" readonly />
+              </div>
+              <div>
+                <label>Total Received</label>
+                <input id="payTotalReceived" value="₹ 0" />
+              </div>
+              <div>
+                <label>Balance / Overdue</label>
+                <input id="payBalance" value="₹ 0" readonly />
+              </div>
+            </div>
+
+            <!-- Receipt ID -->
+            <div class="row">
+              <label>Receipt ID</label>
+              <input id="payReceiptID" readonly />
+            </div>
+
+            <div class="btns">
+              <button class="btn primary" id="payRecord">Record Payment</button>
+              
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Payments -->
+        <div class="card">
+          <h2>Recent Payments (Preview)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Txn ID</th>
+                <th>Date</th>
+                <th>Fee</th>
+                <th>Total</th>
+                <th>Paid</th>
+                <th>Due</th>
+                <th>Advance</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recentPaymentsBody">
+              <!-- filled by JS -->
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reports -->
+    <section id="reports">
+      <div class="grid">
+        <div class="card">
+          <h2>Filters</h2>
+          <div class="row three">
+            <div>
+              <label for="classFilter">Class</label>
+              <select id="classFilter">
+                <option value="">All</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+                <option>LKG</option>
+                <option>UKG</option>
+                <option>Nursery</option>
+              </select>
+            </div>
+            <div>
+              <label for="monthFilter">Month</label>
+              <select id="monthFilter">
+                <option value="2025-04">April 2025</option>
+                <option value="2025-05">May 2025</option>
+                <option value="2025-06">June 2025</option>
+                <option value="2025-07">July 2025</option>
+                <option value="2025-08">August 2025</option>
+                <option value="2025-09">September 2025</option>
+                <option value="2025-10">October 2025</option>
+                <option value="2025-11">November 2025</option>
+                <option value="2025-12">December 2025</option>
+                <option value="2026-01">January 2026</option>
+                <option value="2026-02">February 2026</option>
+                <option value="2026-03">March 2026</option>
+              </select>
+            </div>
+          </div>
+          <div class="btns">
+            <button class="btn primary" onclick="runReport()">Run Report</button>
+            <button class="btn ghost" onclick="exportReport()">Export CSV</button>
+          </div>
+        </div>
+
+        <div id="reportFeedback" class="feedback"></div>
+
+        <div class="card chart-container">
+          <h2>Payment Status</h2>
+          <canvas id="paymentChart"></canvas>
+        </div>
+
+        <div class="card">
+          <h2>Fee Report</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Admission Number</th>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Payment Status</th>
+              </tr>
+            </thead>
+            <tbody id="reportRows"></tbody>
+          </table>
+        </div>
+        
+         <div class="card summary">
+          <p>Total Students: <span id="totalStudents">0</span></p>
+          <p>Paid: <span id="paidCount">0</span></p>
+          <p>Unpaid: <span id="unpaidCount">0</span></p>
+        </div>
+
+        <div class="card">
+          <h2>Collections</h2>
+          <p><b>Today's Collection:</b> ₹<span id="todayCollection">0</span></p>
+          <p><b>This Month's Collection:</b> ₹<span id="monthCollection">0</span></p>
+        </div>
+        <!-- ✅ end new block -->
+
+       
+
+        <div class="card">
+          <h2>Today’s Payments</h2>
+          <ul id="todayPayments"></ul>
+        </div>
+
+      </div>
+    </section>
+
+    <footer>Developed & Maintained By: MarsMeta Tech.</footer>
+
+
+    <!-- Tiny JS ONLY to switch tabs visually (no business logic) -->
+
+    <script>
+      const tabs = document.getElementById('tabs');
+      const sections = Array.from(document.querySelectorAll('section'));
+      tabs.addEventListener('click', (e) => {
+        const a = e.target.closest('a');
+        if (!a) return;
+        e.preventDefault();
+        const id = a.dataset.tab;
+        document.querySelectorAll('.tabs a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+        sections.forEach(s => s.classList.toggle('active', s.id === id));
+        history.replaceState(null, '', `#${id}`);
+      });
+      // Load deep link if present
+      const hash = location.hash.replace('#', '');
+      if (hash) {
+        const link = document.querySelector(`.tabs a[data-tab="${hash}"]`);
+        if (link) link.click();
+      }
+
+      async function runReport() {
+        const classFilter = document.getElementById('classFilter').value;
+        const monthFilter = document.getElementById('monthFilter').value;
+        window.currentReportData = [];
+        await generateAdminReport(classFilter, monthFilter);
+      }
+
+      function exportReport() {
+        const classFilter = document.getElementById('classFilter').value;
+        const monthFilter = document.getElementById('monthFilter').value;
+        exportReportToCSV(classFilter, monthFilter);
+      }
+
+      
+    </script>
+    <script type="module" src="logic.final.js"></script>
+</body>
+
+</html>
